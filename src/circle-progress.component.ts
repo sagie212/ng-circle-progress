@@ -1,5 +1,6 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
-import {Subscription, timer} from 'rxjs';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 
 export interface CircleProgressOptionsInterface {
     class?: string;
@@ -39,7 +40,7 @@ export interface CircleProgressOptionsInterface {
     subtitleFontWeight?: string;
     imageSrc?: string;
     imageHeight?: number;
-    imageWidth?: number;    
+    imageWidth?: number;
     animation?: boolean;
     animateTitle?: boolean;
     animateSubtitle?: boolean;
@@ -119,7 +120,7 @@ export class CircleProgressOptions implements CircleProgressOptionsInterface {
              [attr.height]="svg.height" [attr.width]="svg.width" (click)="emitClickEvent($event)" [attr.class]="options.class">
             <defs>
                 <linearGradient *ngIf="options.outerStrokeGradient" [attr.id]="svg.outerLinearGradient.id">
-                    <stop offset="5%" [attr.stop-color]="svg.outerLinearGradient.colorStop1"  [attr.stop-opacity]="1"/>
+                    <stop offset="5%" [attr.stop-color]="svg.outerLinearGradient.colorStop1" [attr.stop-opacity]="1"/>
                     <stop offset="95%" [attr.stop-color]="svg.outerLinearGradient.colorStop2" [attr.stop-opacity]="1"/>
                 </linearGradient>
                 <radialGradient *ngIf="options.backgroundGradient" [attr.id]="svg.radialGradient.id">
@@ -144,7 +145,7 @@ export class CircleProgressOptions implements CircleProgressOptionsInterface {
                         [attr.fill-opacity]="svg.backgroundCircle.fillOpacity"
                         [attr.stroke]="svg.backgroundCircle.stroke"
                         [attr.stroke-width]="svg.backgroundCircle.strokeWidth"/>
-            </ng-container>            
+            </ng-container>
             <circle *ngIf="options.showInnerStroke"
                     [attr.cx]="svg.circle.cx"
                     [attr.cy]="svg.circle.cy"
@@ -154,17 +155,17 @@ export class CircleProgressOptions implements CircleProgressOptionsInterface {
                     [attr.stroke-width]="svg.circle.strokeWidth"/>
             <ng-container *ngIf="+options.percent!==0 || options.showZeroOuterStroke">
                 <path *ngIf="!options.outerStrokeGradient"
-                        [attr.d]="svg.path.d"
-                        [attr.stroke]="svg.path.stroke"
-                        [attr.stroke-width]="svg.path.strokeWidth"
-                        [attr.stroke-linecap]="svg.path.strokeLinecap"
-                        [attr.fill]="svg.path.fill"/>
+                      [attr.d]="svg.path.d"
+                      [attr.stroke]="svg.path.stroke"
+                      [attr.stroke-width]="svg.path.strokeWidth"
+                      [attr.stroke-linecap]="svg.path.strokeLinecap"
+                      [attr.fill]="svg.path.fill"/>
                 <path *ngIf="options.outerStrokeGradient"
-                        [attr.d]="svg.path.d"
-                        attr.stroke="url(#{{svg.outerLinearGradient.id}})"
-                        [attr.stroke-width]="svg.path.strokeWidth"
-                        [attr.stroke-linecap]="svg.path.strokeLinecap"
-                        [attr.fill]="svg.path.fill"/>
+                      [attr.d]="svg.path.d"
+                      attr.stroke="url(#{{svg.outerLinearGradient.id}})"
+                      [attr.stroke-width]="svg.path.strokeWidth"
+                      [attr.stroke-linecap]="svg.path.strokeLinecap"
+                      [attr.fill]="svg.path.fill"/>
             </ng-container>
             <text *ngIf="!options.showImage && (options.showTitle || options.showUnits || options.showSubtitle)"
                   alignment-baseline="baseline"
@@ -197,12 +198,12 @@ export class CircleProgressOptions implements CircleProgressOptionsInterface {
                     </tspan>
                 </ng-container>
             </text>
-            <image *ngIf="options.showImage" preserveAspectRatio="none" 
-                [attr.height]="svg.image.height"
-                [attr.width]="svg.image.width"
-                [attr.xlink:href]="svg.image.src"
-                [attr.x]="svg.image.x"
-                [attr.y]="svg.image.y"
+            <image *ngIf="options.showImage" preserveAspectRatio="none"
+                   [attr.height]="svg.image.height"
+                   [attr.width]="svg.image.width"
+                   [attr.xlink:href]="svg.image.src"
+                   [attr.x]="svg.image.x"
+                   [attr.y]="svg.image.y"
             />
         </svg>
     `
@@ -412,7 +413,7 @@ export class CircleProgressComponent implements OnChanges {
             }
         }
         // create ID for gradient element
-        if (null === this._gradientUUID){
+        if (null === this._gradientUUID) {
             this._gradientUUID = this.uuid();
         }
         // Bring it all together
@@ -516,8 +517,8 @@ export class CircleProgressComponent implements OnChanges {
         let toPercent = currentPercent;
         let {step: step, interval: interval} = this.getAnimationParameters(fromPercent, toPercent);
         let count = fromPercent;
-        if(fromPercent < toPercent){
-            this._timerSubscription = timer(0, interval).subscribe(() => {
+        if (fromPercent < toPercent) {
+            this._timerSubscription = Observable.timer(0, interval).subscribe(() => {
                 count += step;
                 if (count <= toPercent) {
                     if (!this.options.animateTitle && !this.options.animateSubtitle && count >= 100) {
@@ -531,8 +532,8 @@ export class CircleProgressComponent implements OnChanges {
                     this._timerSubscription.unsubscribe();
                 }
             });
-        }else{
-            this._timerSubscription = timer(0, interval).subscribe(() => {
+        } else {
+            this._timerSubscription = Observable.timer(0, interval).subscribe(() => {
                 count -= step;
                 if (count >= toPercent) {
                     if (!this.options.animateTitle && !this.options.animateSubtitle && toPercent >= 100) {
@@ -590,14 +591,14 @@ export class CircleProgressComponent implements OnChanges {
 
     private uuid = () => {
         // https://www.w3resource.com/javascript-exercises/javascript-math-exercise-23.php
-        var dt = new Date().getTime();
-        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = (dt + Math.random()*16)%16 | 0;
-            dt = Math.floor(dt/16);
-            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+        let dt = new Date().getTime();
+        let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            let r = (dt + Math.random() * 16) % 16 | 0;
+            dt = Math.floor(dt / 16);
+            return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
         return uuid;
-    }
+    };
 
     constructor(
         defaultOptions: CircleProgressOptions) {
